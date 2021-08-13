@@ -16,8 +16,10 @@ static int A = 0x123456; static int B = 0x89AbCdEf; static int C = 0xFeDcBa98; s
 // To save the result computed
 static char tm_value[16];
 
-// The 
+// The length of the read file
 static uint32_t file_length;
+
+int flag = 0;
 
 // The table is computed by abs(sin(i + 1)) ¡Á 2^32
 static uint32_t T[64] = {
@@ -120,6 +122,8 @@ void compute(int* M) {
 		}
 
 		a += A; b += B; c += C; d += D;
+
+		flag = 1;
 }
 
 // When meet the final block, this will fill the rest byte by the rule of MD5
@@ -153,14 +157,6 @@ void fill_buffer(char* buffer, int *data, int block_num) {
 		data[14] = 512 * block_num + file_length;
 		compute(data);
 	}
-
-	/*for (int i = 0; i < 16; i+=4) {
-		printf("%x %x %x %x\n", data[i], data[i + 1], data[i + 2], data[i + 3]);
-	}
-	for (int i = 0; i < 16; i += 4) {
-		printf("%d %d %d %d\n", data[i], data[i + 1], data[i + 2], data[i + 3]);
-	}*/
-
 }
 
 char* tm_load_dir(const char* path) {
@@ -189,6 +185,10 @@ char* tm_load_dir(const char* path) {
 				| ((uint32_t)bu[j + 3] << 24);
 			bu[j] = -52; bu[j + 1] = -52; bu[j + 2] = -52; bu[j + 3] = -52;
 		}
+		/*DWORD id;
+		HANDLE hThr;
+		if (flag == 1)
+			hThr = CreateThread(NULL, 0, compute, (uint32_t*)buffer, 0, &id);*/
 		compute(buffer);
 		i++;
 	}
